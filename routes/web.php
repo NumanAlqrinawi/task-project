@@ -27,3 +27,11 @@ Route::post('/about', function () {
         '3' => 'html'];
     return view('about', compact('firstName', 'lastName', 'departments'));
 });
+Route::get('tasks', function () {
+    return view('tasks');
+});
+Route::post('create', function () {
+    $taskName = $_POST['name'];
+    DB::table('tasks')->insert(['name' => $taskName ]);
+    return view('tasks');
+});
