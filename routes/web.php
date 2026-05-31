@@ -1,9 +1,11 @@
 <?php
 
-use Illuminate\Http\RedirectResponse;
+use App\Http\Controllers\TaskController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Constraint\Operator;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,31 +34,16 @@ Route::post('/about', function () {
     return view('about', compact('firstName', 'lastName', 'departments'));
 });
 
-// التعديل الأساسي هنا: جلب المهام وتمريرها للملف
-Route::get('tasks', function () {
-    $tasks = DB::table('tasks')->get();
-    return view('tasks', compact('tasks'));
+Route::get('/tasks', action: [TaskController::class, 'index']);
+Route::post('/create', action: [TaskController::class, 'create']);
+Route::post('delete/{id}', action: [TaskController::class, 'destroy']);
+Route::post('edit/{id}', action: [TaskController::class, 'edit']);
+Route::post('update', action: [TaskController::class, 'update']);
+Route::get('app', action: function (): View {
+    return view(view:'layouts.app');
 });
-
-// التعديل الثاني: التوجيه الصريح لصفحة الـ tasks بعد الإضافة
-Route::post('create', function () {
-    $taskName = $_POST['name'];
-    DB::table('tasks')->insert(['name' => $taskName]);
-    return redirect('tasks');
-});
-Route::post('delete/{id}', function($id){
-   DB::table('tasks')->where('id', '=', $id)->delete();
-   return redirect()->back();
-});
-
-Route::post('edit/{id}', function($id){
-    $task = DB::table('tasks')->where('id', $id)->first();
-    $tasks = DB::table('tasks')->get();
-    return view('tasks', compact('task', 'tasks'));
-});
-
-Route::post('update', function() {
-    $id = $_POST['id'];
-    DB::table('tasks')->where('id', '=', $id)->update(['name' => $_POST['name']]);
-    return redirect('tasks');
-});
+Route::get('/users', [UserController::class, 'index']);
+Route::post('/createUser', [UserController::class, 'create']);
+Route::post('/deleteUser/{id}', [UserController::class, 'destroy']);
+Route::post('/editUser/{id}', [UserController::class, 'edit']);
+Route::post('/updateUser', [UserController::class, 'update']);
